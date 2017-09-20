@@ -1,4 +1,15 @@
 安装PHP、MYSQL等程序
 sh /mnt/sda3/web_install/web_install.sh
 卸载
-sh /mnt/sda3/PHP7install/web_remove.sh
+sh /mnt/sda3/web_install/web_remove.sh
+
+nginx配置测试
+nginx -t
+
+你可以在终端使用 www 命令来控制网站
+www start   启动服务器
+www stop    关闭服务器
+www restart 重启服务器
+
+上传文件到网站时记得设置所有者为: www 用户组: www
+你可以使用 /etc/init.d/wwwset start 来快捷设置

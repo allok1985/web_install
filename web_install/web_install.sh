@@ -1,3 +1,5 @@
+#原始代码来自一个梨博客
+
 # https://blog.sunxyz.com
 # update 1 date 2017.06.12
 
@@ -146,32 +148,32 @@ opkg install $PHPWEB/ipk/nginx_1.10.3-2_x86_64.ipk --force-depends
 	echo "安装完成" > /tmp/weblog/web_install.log
 fi
 
-PACKAGE_NAME="$PHP_VER.tar.gz"
+PACKAGE_NAME="$PHP_VER.tar.bz2"
 if [ ! -f "/tmp/weblog/web_config.log" ]; then
 
-	if [ -d "/mnt/sda3/web_install/mysql" ]; then
-		echo -e "\n错误: $WEB_PATH/mysql 已存在。"
+	if [ -d "$WEB_PATH/mysql" ]; then
+		echo -e "\n$WEB_PATH/mysql 已存在。"
 		echo "请备份后删除再重试，或将其重命名"
 		echo -e "\n使用这条命令可以直接删除，确保你已经不需要它了"
 		echo "rm -rf $WEB_PATH/mysql"
-		exit 1
+		exit
 	fi
 
 	[ ! -d "$WEB_PATH/www" ]&& mkdir $WEB_PATH/www
 
 	if [ ! -f "$WEB_PATH/www/$PACKAGE_NAME" ]; then
 		echo -e "\n开始下载 $PACKAGE_NAME"
-		if (wget "$PHPWEB/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
-			echo -e "\n错误: $PHPWEB/$PACKAGE_NAME 下载失败。"
-			exit 1
+		if (wget "$CONFIG_DOWN_SITE/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
+			echo -e "\n$CONFIG_DOWN_SITE/$PACKAGE_NAME 下载失败。"
+			exit
 		fi
 	fi
 	
-	[ -f "$WEB_PATH/www/$PHP_VER" ] && rm -rf $WEB_PATH/www/$PHP_VER
+	[ -f "$WEB_PATH/www/$PHP_VER" ]&& rm -rf $WEB_PATH/www/$PHP_VER
 	
-	if (tar -zxvf $WEB_PATH/www/$PACKAGE_NAME -C $WEB_PATH/www); then :; else
-		echo -e "\n错误: 解压 $WEB_PATH/www/$PACKAGE_NAME 失败"
-		exit 1
+	if (tar -xjf $WEB_PATH/www/$PACKAGE_NAME -C $WEB_PATH/www); then :; else
+		echo -e "\n解压 $WEB_PATH/www/$PACKAGE_NAME 失败"
+		exit
 	fi
 	
 	rm -rf /etc/nginx
@@ -195,7 +197,7 @@ if [ ! -f "/tmp/weblog/web_config.log" ]; then
 	chmod 0755 /etc/php.ini
 	chmod 0755 /usr/bin/www
 	
-	useradd www > /dev/null 2>&1
+	useradd www
 
 	# mysql 配置路径
 	sed  "s#mysqldata#$WEB_PATH/mysql/data/#" -i /etc/my.cnf
@@ -205,20 +207,20 @@ if [ ! -f "/tmp/weblog/web_config.log" ]; then
 	sed  "s#phpn-fpm#$PHP_VER-fpm#" -i /usr/bin/www
 
 	# wwwroot 配置端口，路径
-	# sed  "s#wwwport#$WEB_ROOT_PORT#" -i /etc/nginx/vhost/www.conf
-	# sed  "s#wwwpath#$WEB_PATH/www/wwwroot#" -i /etc/nginx/vhost/www.conf
+	sed  "s#wwwport#$WEB_ROOT_PORT#" -i /etc/nginx/vhost/www.conf
+	sed  "s#wwwpath#$WEB_PATH/www/wwwroot#" -i /etc/nginx/vhost/www.conf
 
 	# phpmyadmin 配置端口，路径
-	# sed  "s#wwwport#$PHPMYADMIN_PORT#" -i /etc/nginx/host/phpmyadmin.conf
-	# sed  "s#wwwpath#$WEB_PATH/www/phpmyadmin#" -i /etc/nginx/host/phpmyadmin.conf
+	sed  "s#wwwport#$PHPMYADMIN_PORT#" -i /etc/nginx/host/phpmyadmin.conf
+	sed  "s#wwwpath#$WEB_PATH/www/phpmyadmin#" -i /etc/nginx/host/phpmyadmin.conf
 	
 	# kodexplorer 配置端口，路径
-	# sed  "s#wwwport#$KODEXPLORER_PORT#" -i /etc/nginx/host/kodexplorer.conf
-	# sed  "s#wwwpath#$WEB_PATH/www/kodexplorer#" -i /etc/nginx/host/kodexplorer.conf
+	sed  "s#wwwport#$KODEXPLORER_PORT#" -i /etc/nginx/host/kodexplorer.conf
+	sed  "s#wwwpath#$WEB_PATH/www/kodexplorer#" -i /etc/nginx/host/kodexplorer.conf
 	
 	# owncloud 配置端口，路径
-	# sed  "s#wwwport#$OWNCLONUD_PORT#" -i /etc/nginx/host/owncloud.conf
-	# sed  "s#wwwpath#$WEB_PATH/www/owncloud#" -i /etc/nginx/host/owncloud.conf
+	sed  "s#wwwport#$OWNCLONUD_PORT#" -i /etc/nginx/host/owncloud.conf
+	sed  "s#wwwpath#$WEB_PATH/www/owncloud#" -i /etc/nginx/host/owncloud.conf
 	
 	mkdir $WEB_PATH/mysql
 	mkdir $WEB_PATH/mysql/data
@@ -234,14 +236,14 @@ if [ ! -f "/tmp/weblog/web_config.log" ]; then
 	sleep 3s
 
 	if [ ! -n "$(pgrep mysqld)" ]; then
-		echo -e "\n错误: mysql启动失败"
+		echo -e "\nmysql启动失败"
 		rm -R $WEB_PATH/mysql
-		exit 1
+		exit
 	else
 		/usr/bin/mysqladmin -u root -p123456 password $MYSQL_PASSWORD
 	fi
 	
-	echo "配置完成" > /tmp/weblog/web_config.log
+	echo "完成" > /tmp/weblog/web_config.log
 fi
 
 if [ ! -f "/tmp/weblog/tz.php.log" ]&&[ "$ZBLOG" != "1" ]; then
@@ -249,30 +251,31 @@ if [ ! -f "/tmp/weblog/tz.php.log" ]&&[ "$ZBLOG" != "1" ]; then
 	[ ! -d "$WEB_PATH/www/wwwroot" ]&& mkdir $WEB_PATH/www/wwwroot
 
 	if [ ! -f "$WEB_PATH/www/wwwroot/tz.php" ]; then
-		if (wget "$PHPWEB/tz.php" --no-check-certificate -P $WEB_PATH/www/wwwroot); then :; else
-			echo -e "\n错误: $PHPWEB/tz.php 下载失败。"
+		if (wget "$CONFIG_DOWN_SITE/tz.php" --no-check-certificate -P $WEB_PATH/www/wwwroot); then :; else
+			echo -e "\n$CONFIG_DOWN_SITE/tz.php 下载失败。"
+			exit
 		fi
 	fi
 
-	echo "tz.php下载完成" > /tmp/weblog/tz.php.log
+	echo "完成" > /tmp/weblog/tz.php.log
 fi
 
-PACKAGE_NAME="zblog.tar.gz"
+PACKAGE_NAME="zblog.tar.bz2"
 if [ ! -f "/tmp/weblog/$PACKAGE_NAME.log" ]&&[ "$ZBLOG" == "1" ]; then
 
 	if [ -d "$WEB_PATH/www/wwwroot" ]; then
-		echo -e "\n错误: $WEB_PATH/www/wwwroot 已存在。"
+		echo -e "\n$WEB_PATH/www/wwwroot 已存在。"
 		echo "请备份后删除再重试，或将其重命名"
 		echo -e "\n使用这条命令可以直接删除，确保你已经不需要它了"
 		echo "rm -rf $WEB_PATH/www/wwwroot"
-		exit 1
+		exit
 	fi
 
 	if [ ! -f "$WEB_PATH/www/$PACKAGE_NAME" ]; then
 		echo -e "\n开始下载 $PACKAGE_NAME"
-		if (wget "$PHPWEB/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
-			echo -e "\n错误: $PHPWEB/$PACKAGE_NAME 下载失败。"
-			exit 1
+		if (wget "$CONFIG_DOWN_SITE/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
+			echo -e "\n$CONFIG_DOWN_SITE/$PACKAGE_NAME 下载失败。"
+			exit
 		fi
 	fi
 	
@@ -281,87 +284,105 @@ if [ ! -f "/tmp/weblog/$PACKAGE_NAME.log" ]&&[ "$ZBLOG" == "1" ]; then
 	mkdir $WEB_PATH/www/wwwroot
 	echo -e "\n正在解压 $PACKAGE_NAME"
 		
-	if (tar -zxvf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
-		echo -e "\n错误: $WEB_PATH/www/$PACKAGE_NAME 解压失败"
-		rm -rf $WEB_PATH/www/wwwroot
-		exit 1 
+	if (tar -xjf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
+		echo -e "\n$WEB_PATH/www/$PACKAGE_NAME 解压失败"
+		rm -R $WEB_PATH/www/wwwroot
+		exit
 	fi
 
 	mv $WEB_PATH/www/zblog/* $WEB_PATH/www/wwwroot
 
-	echo "zblog配置完成" > /tmp/weblog/$PACKAGE_NAME.log
+	echo "完成" > /tmp/weblog/$PACKAGE_NAME.log
 fi
 
-PACKAGE_NAME="phpmyadmin.tar.gz"
+PACKAGE_NAME="phpmyadmin.tar.bz2"
 if [ ! -f "/tmp/weblog/$PACKAGE_NAME.log" ]&&[ "$PHPMYADMIN" == "1" ]; then
 
-	[ -d "$WEB_PATH/www/phpmyadmin" ] && rm -rf $WEB_PATH/www/phpmyadmin
+	if [ -d "$WEB_PATH/www/phpmyadmin" ]; then
+		echo -e "\n$WEB_PATH/www/phpmyadmin 已存在。"
+		echo "请备份后删除再重试，或将其重命名"
+		echo -e "\n使用这条命令可以直接删除，确保你已经不需要它了"
+		echo "rm -R $WEB_PATH/www/phpmyadmin"
+		exit
+	fi
 	
 	if [ ! -f "$WEB_PATH/www/$PACKAGE_NAME" ]; then
 		echo -e "\n开始下载 $PACKAGE_NAME"
-		if (wget "$PHPWEB/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
-			echo -e "\n错误: $PHPWEB/$PACKAGE_NAME 下载失败。"
-			exit 1
+		if (wget "$CONFIG_DOWN_SITE/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
+			echo -e "\n$CONFIG_DOWN_SITE/$PACKAGE_NAME 下载失败。"
+			exit
 		fi
 	fi
 
 	echo -e "\n正在解压 $PACKAGE_NAME"
-	if (tar -zxvf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
-		echo -e "\n错误: $WEB_PATH/www/$PACKAGE_NAME 解压失败"
-		exit 1
+	if (tar -xjf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
+		echo -e "\n$WEB_PATH/www/$PACKAGE_NAME 解压失败"
+		exit
 	fi
 		
 	cp /etc/nginx/host/phpmyadmin.conf /etc/nginx/vhost
 		
-	echo "phpmyadmin配置完成" > /tmp/weblog/$PACKAGE_NAME.log
+	echo "完成" > /tmp/weblog/$PACKAGE_NAME.log
 fi
 
-PACKAGE_NAME="kodexplorer.tar.gz"
+PACKAGE_NAME="kodexplorer.tar.bz2"
 if [ ! -f "/tmp/weblog/$PACKAGE_NAME.log" ]&&[ "$KODEXPLORER" == "1" ]; then
 
-	[ -d "$WEB_PATH/www/kodexplorer" ] && rm -rf $WEB_PATH/www/kodexplorer
+	if [ -d "$WEB_PATH/www/kodexplorer" ]; then
+		echo -e "\n$WEB_PATH/www/kodexplorer 已存在。"
+		echo "请备份后删除再重试，或将其重命名"
+		echo -e "\n使用这条命令可以直接删除，确保你已经不需要它了"
+		echo "rm -R $WEB_PATH/www/kodexplorer"
+		exit
+	fi
 	
 	if [ ! -f "$WEB_PATH/www/$PACKAGE_NAME" ]; then
 		echo -e "\n开始下载 $PACKAGE_NAME"
-		if (wget "$PHPWEB/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
-			echo -e "\n$PHPWEB/$PACKAGE_NAME 下载失败。"
-			exit 1
+		if (wget "$CONFIG_DOWN_SITE/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
+			echo -e "\n$CONFIG_DOWN_SITE/$PACKAGE_NAME 下载失败。"
+			exit
 		fi
 	fi
 	
 	echo -e "\n正在解压 $PACKAGE_NAME"
-	if (tar -zxvf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
+	if (tar -xjf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
 		echo -e "\n$WEB_PATH/www/$PACKAGE_NAME 解压失败"
-		exit 1
+		exit
 	fi
 		
 	cp /etc/nginx/host/kodexplorer.conf /etc/nginx/vhost
 		
-	echo "kodexplorer完成" > /tmp/weblog/$PACKAGE_NAME.log
+	echo "完成" > /tmp/weblog/$PACKAGE_NAME.log
 fi
 
-PACKAGE_NAME="owncloud.tar.gz"
+PACKAGE_NAME="owncloud.tar.bz2"
 if [ ! -f "/tmp/weblog/$PACKAGE_NAME.log" ]&&[ "$OWNCLONUD" == "1" ]; then
 
-	[ -d "$WEB_PATH/www/owncloud" ] && rm -rf $WEB_PATH/www/owncloud
+	if [ -d "$WEB_PATH/www/owncloud" ]; then
+		echo -e "\n$WEB_PATH/www/owncloud 已存在。"
+		echo "请备份后删除再重试，或将其重命名"
+		echo -e "\n使用这条命令可以直接删除，确保你已经不需要它了"
+		echo "rm -R $WEB_PATH/www/owncloud"
+		exit
+	fi
 	
 	if [ ! -f "$WEB_PATH/www/$PACKAGE_NAME" ]; then
 		echo -e "\n开始下载 $PACKAGE_NAME"
-		if (wget "$PHPWEB/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
-			echo -e "\n错误: $PHPWEB/$PACKAGE_NAME 下载失败。"
-			exit 1
+		if (wget "$CONFIG_DOWN_SITE/$PACKAGE_NAME" --no-check-certificate -P $WEB_PATH/www); then :; else
+			echo -e "\n$CONFIG_DOWN_SITE/$PACKAGE_NAME 下载失败。"
+			exit
 		fi
 	fi
 	
 	echo -e "\n正在解压 $PACKAGE_NAME"
-	if (tar -zxvf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
-		echo -e "\n错误: $WEB_PATH/www/$PACKAGE_NAME 解压失败"
-		exit 1
+	if (tar -xjf $WEB_PATH/www/$PACKAGE_NAME  -C $WEB_PATH/www); then :; else
+		echo -e "\n$WEB_PATH/www/$PACKAGE_NAME 解压失败"
+		exit
 	fi
 		
 	cp /etc/nginx/host/owncloud.conf /etc/nginx/vhost
 		
-	echo "owncloud完成" > /tmp/weblog/$PACKAGE_NAME.log
+	echo "完成" > /tmp/weblog/$PACKAGE_NAME.log
 fi
 
 echo -e "\n启动nginx"
@@ -369,8 +390,8 @@ echo -e "\n启动nginx"
 sleep 2s
 
 if [ ! -n "$(pgrep nginx)" ]; then
-	echo -e "\n错误: nginx启动失败"
-	exit 1
+	echo -e "\nnginx启动失败"
+	exit
 fi
 
 echo -e "\n启动$PHP_VER-fpm"
@@ -378,8 +399,8 @@ echo -e "\n启动$PHP_VER-fpm"
 sleep 2s
 
 if [ ! -n "$(pgrep $PHP_VER-fpm)" ]; then
-	echo -e "\n错误: $PHP_VER-fpm启动失败"
-	exit 1
+	echo -e "\n$PHP_VER-fpm启动失败"
+	exit
 fi
 
 echo "
@@ -476,6 +497,8 @@ rm -rf $WEB_PATH/www
 rm -rf $WEB_PATH/mysql
 mv $WEB_PATH/www0 $WEB_PATH/www
 mv $WEB_PATH/mysql0 $WEB_PATH/mysql
+echo -e "\n网站文件权限恢复"
+/etc/init.d/wwwset start
 www restart
 echo -e "\n重新安装后重启PHP7"
 echo -e "\n安装完成"
