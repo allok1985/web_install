@@ -1,0 +1,55 @@
+以下版本测试通过，其他版本自行尝试
+官方 OpenWrt Chaos Calmer 15.05 x86
+官方 LEDE 17.01.0 x86
+Padavan 系统请勿尝试
+
+LEDE 安装的是 php7
+OpenWrt 安装的是 php5
+
+带三个php程序
+phpmyadmin 数据库管理程序，默认安装
+typecho 博客系统，可选安装
+kodexplorer 私有云，可选安装
+
+你需要一个大于100MB的储存设备来储存网站数据以及mysql数据，
+并且文件系统只能是 ext2 ext3 ext4
+
+mysql数据库账号: root 密码: 123456  安装完后请务必使用phpmyadmin修改密码
+
+onmp 命令说明
+
+安装完成后可使用 onmp 指令来控制onmp以及添加删除虚拟主机
+为了保证添加删除命令正常使用请勿修改 /etc/nginx/sites-available  和 /etc/nginx/sites-enabled 目录内容
+
+    onmp ls    #查看所有虚拟主机.
+    onmp del 虚拟主机名称   #删除一个虚拟主机.
+    onmp add 虚拟主机名称 端口号    #添加一个虚拟主机.
+    onmp set    #设置网站目录权限以及mysql数据库目录权限.
+    onmp restart    #重新启动 nginx mysql php.
+    onmp start    #启动 nginx mysql php.
+    onmp stop    #关闭 nginx mysql php.
+
+注意
+使用 SSH 连接OpenWrt 一定要设置为 UTF-8 编码，不然会乱码看不见提示
+PuTTY 设置方法
+
+ 
+
+可能会遇到的问题
+
+安装 php5-mod-opcache 出错
+OpenWrt 15.05.1 以下的版本是没有这个包的，你需要到 15.05.1 下载 手动安装它
+php5-mod-opcache 是php的缓存模块，对路由器来说是非常重要的
+
+下载地址：https://downloads.openwrt.org/chaos_calmer/15.05.1/ 根据自己的cpu型号下载
+
+如 7620 的下载地址
+https://downloads.openwrt.org/chaos_calmer/15.05.1/ramips/mt7620/packages/packages/
+
+然后 Ctrl+F 搜索 php5-mod-opcache 下载。上传到路由器的 /tmp 目录
+然后 opkg install /tmp/你的包名称.ipk 来安装它
+
+
+上传到 /tmp   然后执行
+
+    sh /tmp/onmp.sh
