@@ -1,0 +1,4 @@
+安装PHP、MYSQL等程序
+sh /mnt/sda3/web_install/web_install.sh
+卸载
+sh /mnt/sda3/PHP7install/web_remove.sh
