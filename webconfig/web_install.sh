@@ -88,6 +88,7 @@ if [ ! -f "/tmp/weblog/web_install.log" ]; then
 	
 	echo -e "\n开始安装程序"
 
+	install_ipk libpng
 	install_ipk shadow-useradd
 	install_ipk zoneinfo-core
 	install_ipk zoneinfo-asia

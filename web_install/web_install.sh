@@ -95,6 +95,7 @@ if [ ! -f "/tmp/weblog/web_install.log" ]; then
 	
 	echo -e "\n开始安装程序"
 
+opkg install $PHPWEB/ipk/libpng_1.2.57-1_x86_64.ipk --force-depends
 opkg install $PHPWEB/ipk/shadow-useradd_4.2.1-6_x86_64.ipk --force-depends
 opkg install $PHPWEB/ipk/shadow-common_4.2.1-6_x86_64.ipk --force-depends
 opkg install $PHPWEB/ipk/zoneinfo-core_2017b-1_x86_64.ipk --force-depends
