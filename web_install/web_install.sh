@@ -12,7 +12,7 @@ WEB_PATH="/mnt/sda3"
 # 安装文件所在目录
 PHPWEB="/mnt/sda3/web_install"
 
-MYSQL_PASSWORD="456789xx"  # 数据库密码
+MYSQL_PASSWORD="123456"  # 数据库密码
  
 # 根据需求选择
 # 1 是

@@ -1,18 +1,14 @@
 # https://blog.sunxyz.com
 # update 1 date 2017.06.12
-
-
-
 #############################################################################################
 # 用户配置
-
 # 网站安装路径及数据库储存路径. 路径最后不要添加 /
 # 脚本会在这个路径下创建 mysql与www 文件夹,确保这个路径下没有这两个文件夹
 WEB_PATH="/mnt/sda3"
 # 安装文件所在目录
 PHPWEB="/mnt/sda3/web_install"
 
-MYSQL_PASSWORD="456789xx"  # 数据库密码
+MYSQL_PASSWORD="123456"  # 数据库密码
  
 # 根据需求选择
 # 1 是
@@ -93,48 +89,51 @@ check_port $WEB_ROOT_PORT
 if [ ! -f "/tmp/weblog/web_install.log" ]; then
 
 	
+	if [ ! -f "/tmp/weblog/update.log" ]; then
+			opkg update
+			echo "更新完成" > /tmp/weblog/update.log
+	fi
+
 	echo -e "\n开始安装程序"
 
-opkg install $CONFIG_DOWN_SITE/ipk/libpng_1.2.57-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/shadow-useradd_4.2.1-6_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/shadow-common_4.2.1-6_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/zoneinfo-core_2017b-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/zoneinfo-asia_2017b-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/tar_1.29-3_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/wget_1.18-2_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-gd_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-session_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-pdo_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-pdo-mysql_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-mysqli_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/libmysqlclient_5.1.73-2_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-mcrypt_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/libmcrypt_2.5.8-2_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-mbstring_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-cgi_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-fastcgi_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-cgi_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-xml_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-ctype_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-curl_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-exif_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-ftp_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-iconv_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-json_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-sockets_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-sqlite3_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-tokenizer_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-zip_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-simplexml_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-dom_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-xmlwriter_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-xmlreader_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-hash_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-fpm_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/php7-mod-opcache_7.1.1-1_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/mysql-server_5.1.73-2_x86_64.ipk --force-depends
-opkg install $CONFIG_DOWN_SITE/ipk/nginx_1.10.3-2_x86_64.ipk --force-depends
+	install_ipk libpng
+	install_ipk shadow-useradd
+	install_ipk zoneinfo-core
+	install_ipk zoneinfo-asia
+	install_ipk libmcrypt
+	install_ipk tar
+	install_ipk wget
+	install_ipk $PHP_VER
+	install_ipk $PHP_VER-mod-gd
+	install_ipk $PHP_VER-mod-session
+	install_ipk $PHP_VER-mod-pdo
+	install_ipk $PHP_VER-mod-pdo-mysql
+	install_ipk $PHP_VER-mod-mysqli
+	[ "$PHP_VER" == "php5" ]&& install_ipk $PHP_VER-mod-mysql
+	[ "$PHP_VER" == "php5" ]&& install_ipk $PHP_VER-mod-mcrypt
+	install_ipk $PHP_VER-mod-mbstring
+	install_ipk $PHP_VER-fastcgi
+	install_ipk $PHP_VER-cgi
+	install_ipk $PHP_VER-mod-xml
+	install_ipk $PHP_VER-mod-ctype
+	install_ipk $PHP_VER-mod-curl
+	install_ipk $PHP_VER-mod-exif
+	install_ipk $PHP_VER-mod-ftp
+	install_ipk $PHP_VER-mod-iconv
+	install_ipk $PHP_VER-mod-json
+	install_ipk $PHP_VER-mod-sockets
+	install_ipk $PHP_VER-mod-sqlite3
+	install_ipk $PHP_VER-mod-tokenizer
+	install_ipk $PHP_VER-mod-zip
+	install_ipk $PHP_VER-mod-simplexml
+	install_ipk $PHP_VER-mod-dom
+	install_ipk $PHP_VER-mod-xmlwriter
+	install_ipk $PHP_VER-mod-xmlreader
+	install_ipk $PHP_VER-mod-hash
+	install_ipk $PHP_VER-fpm
+	install_ipk $PHP_VER-mod-opcache
+	install_ipk mysql-server
+         opkg install $PHPWEB/ipk/nginx_1.10.3-2_x86_64.ipk --force-depends
 
 	/etc/init.d/nginx stop
 	/etc/init.d/mysqld stop

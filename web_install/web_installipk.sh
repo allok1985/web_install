@@ -12,7 +12,7 @@ WEB_PATH="/mnt/sda3"
 # 安装文件所在目录
 PHPWEB="/mnt/sda3/web_install"
 
-MYSQL_PASSWORD="456789xx"  # 数据库密码
+MYSQL_PASSWORD="123456"  # 数据库密码
  
 # 根据需求选择
 # 1 是
@@ -95,6 +95,7 @@ if [ ! -f "/tmp/weblog/web_install.log" ]; then
 	
 	echo -e "\n开始安装程序"
 
+opkg install $PHPWEB/ipk/libpng_1.2.57-1_x86_64.ipk --force-depends
 opkg install $PHPWEB/ipk/shadow-useradd_4.2.1-6_x86_64.ipk --force-depends
 opkg install $PHPWEB/ipk/shadow-common_4.2.1-6_x86_64.ipk --force-depends
 opkg install $PHPWEB/ipk/zoneinfo-core_2017b-1_x86_64.ipk --force-depends
